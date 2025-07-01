@@ -14,6 +14,7 @@ def load_books(filename='library.json'):
         except json.JSONDecodeError:
             return []
 
+
 def saving_books(books, filename='library.json'):
     """
     Сохранение списка книг в JSON-файл.
@@ -119,17 +120,13 @@ def main():
             else:
                 print("Ничего не найдено.")
 
-        elif choice == '6':
+        elif choice == '5':
             print("Выход из программы.")
             break
 
         else:
             print("Некорректный ввод. Попробуйте ещё раз.")
 
-
-
-
-
-
+            
 if __name__ == "__main__":
     main()
