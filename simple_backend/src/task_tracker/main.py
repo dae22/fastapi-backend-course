@@ -20,7 +20,7 @@ def create_task(task):
 @app.put("/tasks/{task_id}")
 def update_task(task_id: int):
     if task_storage.update_task(task_id):
-        return {'message': 'Task marked as completed'}
+        return {'message': 'Task status update'}
     return {'message': 'Task not found'}
 
 

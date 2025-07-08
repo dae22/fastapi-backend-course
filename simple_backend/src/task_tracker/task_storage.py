@@ -1,39 +1,31 @@
-import json
+from http.client import responses
+
+import requests
+
 
 class TaskStorage:
-    def __init__(self, file_path='database.json'):
-        self.file_path = file_path
+    new_id = 0
+
+    def __init__(self):
+        self.url = "https://686d861bc9090c4953868efa.mockapi.io/tasks"
 
     def read_tasks(self):
-        try:
-            with open(self.file_path, 'r') as file:
-                return json.load(file)
-        except json.JSONDecodeError:
-            return dict()
+        response = requests.get(self.url)
+        return response.json()
 
-    def write_tasks(self, tasks):
-        with open(self.file_path, 'w') as file:
-            json.dump(tasks, file)
+    def write_task(self, task):
+        requests.post(self.url, json=task)
 
     def add_task(self, task_description):
-        tasks = self.read_tasks()
-        new_id = len(tasks)
-        tasks[str(new_id)] = {'task': task_description, 'status': False}
-        self.write_tasks(tasks)
-        return new_id
+        task = {"task": task_description, "status": False, "id": self.new_id}
+        self.new_id += 1
+        self.write_task(task)
+        return self.new_id - 1
 
     def update_task(self, task_id, new_status=True):
-        tasks = self.read_tasks()
-        if str(task_id) in tasks:
-            tasks[str(task_id)]['status'] = new_status
-            self.write_tasks(tasks)
-            return True
-        return False
+        response = requests.patch(f'{self.url}/{task_id}', json={"status": new_status})
+        return response.ok
 
     def delete_task(self, task_id):
-        tasks = self.read_tasks()
-        if str(task_id) in tasks:
-            del tasks[str(task_id)]
-            self.write_tasks(tasks)
-            return True
-        return False
+        response = requests.delete(f'{self.url}/{task_id}')
+        return response.ok
