@@ -1,8 +1,9 @@
 from fastapi import FastAPI
-from task_storage import TaskStorage
+from models import TaskStorage, Cloudflare
 
 app = FastAPI()
 task_storage = TaskStorage()
+llm_model = Cloudflare()
 
 
 @app.get("/tasks")
@@ -13,7 +14,9 @@ def get_tasks():
 
 @app.post("/tasks")
 def create_task(task):
-    index = task_storage.add_task(task)
+    response = llm_model.ask_solution(task)
+    solution = response['result']['response']
+    index = task_storage.add_task(task, solution)
     return {'message': f'New task added. Assigned id: {index}'}
 
 
