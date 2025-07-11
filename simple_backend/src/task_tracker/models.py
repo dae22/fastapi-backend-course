@@ -1,11 +1,24 @@
 import requests
 
 
-class TaskStorage:
+class BaseHTTPClient:
+    def __init__(self, url, headers):
+        self.url = url
+        self.headers = headers
+
+    def post_request(self, json_data):
+        response = requests.post(url=self.url, json=json_data, headers=self.headers)
+        response.raise_for_status()
+        return response.json()
+
+
+class TaskStorage(BaseHTTPClient):
     new_id = 0
 
     def __init__(self):
-        self.url = "https://686d861bc9090c4953868efa.mockapi.io/tasks"
+        super().__init__(
+            url="https://686d861bc9090c4953868efa.mockapi.io/tasks",
+            headers={"Content-Type": "application/json"})
 
     def read_tasks(self):
         response = requests.get(self.url)
@@ -14,7 +27,7 @@ class TaskStorage:
     def add_task(self, task_description, solution):
         task = {"task": task_description, "solution": solution, "status": False, "id": self.new_id}
         self.new_id += 1
-        requests.post(self.url, json=task)
+        self.post_request(json_data=task)
         return self.new_id - 1
 
     def update_task(self, task_id, new_status=True):
@@ -26,10 +39,11 @@ class TaskStorage:
         return response.ok
 
 
-class Cloudflare:
+class Cloudflare(BaseHTTPClient):
     def __init__(self):
-        self.url = "https://api.cloudflare.com/client/v4/accounts/9da3e3c5869ff2a1a4565edbb552d270/ai/run/@cf/meta/llama-3-8b-instruct"
-        self.headers = {"Authorization": "Bearer xW7wjmZGc3_3CEsCgPwCKx6D-ROE3-gL6aaltaQ_"}
+        super().__init__(
+            url="https://api.cloudflare.com/client/v4/accounts/9da3e3c5869ff2a1a4565edbb552d270/ai/run/@cf/meta/llama-3-8b-instruct",
+            headers = {"Authorization": "Bearer xW7wjmZGc3_3CEsCgPwCKx6D-ROE3-gL6aaltaQ_"})
 
     def ask_solution(self, task_description):
         json_message = {"messages": [
@@ -37,5 +51,4 @@ class Cloudflare:
             {"role": "user",
              "content": f"Please advise haw i can solve this task: {task_description}"}
         ]}
-        response = requests.post(self.url, headers=self.headers, json=json_message)
-        return response.json()
+        return self.post_request(json_data=json_message)
