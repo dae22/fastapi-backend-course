@@ -15,11 +15,6 @@ class BaseHTTPClient:
 class TaskStorage(BaseHTTPClient):
     new_id = 0
 
-    def __init__(self):
-        super().__init__(
-            url="https://686d861bc9090c4953868efa.mockapi.io/tasks",
-            headers={"Content-Type": "application/json"})
-
     def read_tasks(self):
         response = requests.get(self.url)
         return response.json()
@@ -40,10 +35,6 @@ class TaskStorage(BaseHTTPClient):
 
 
 class Cloudflare(BaseHTTPClient):
-    def __init__(self):
-        super().__init__(
-            url="https://api.cloudflare.com/client/v4/accounts/9da3e3c5869ff2a1a4565edbb552d270/ai/run/@cf/meta/llama-3-8b-instruct",
-            headers = {"Authorization": "Bearer xW7wjmZGc3_3CEsCgPwCKx6D-ROE3-gL6aaltaQ_"})
 
     def ask_solution(self, task_description):
         json_message = {"messages": [

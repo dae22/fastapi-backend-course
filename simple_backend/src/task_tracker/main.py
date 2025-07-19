@@ -1,9 +1,10 @@
 from fastapi import FastAPI
 from models import TaskStorage, Cloudflare
+import os, json
 
 app = FastAPI()
-task_storage = TaskStorage()
-llm_model = Cloudflare()
+task_storage = TaskStorage(url=os.getenv("TASK_URL"), headers=json.loads(os.getenv("TASK_HEADERS")))
+llm_model = Cloudflare(url=os.getenv("LLM_URL"), headers=json.loads(os.getenv("LLM_HEADERS")))
 
 
 @app.get("/tasks")
